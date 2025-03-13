@@ -1,11 +1,13 @@
 const User = require("../models/user.model");
 const { generateToken } = require("../lib/utils");
 const bcrypt = require("bcrypt");
-const cloudinary = require("../lib/cloudinaly");
+const cloudinary = require("../lib/cloudinary");
 const { model } = require("mongoose");
 
 exports.signup = async (req, res) => {
   const { email, fullname, password } = req.body; //rename ได้โดย  test : newTest
+  console.log(email, fullname, password);
+
   if (!email || !fullname || !password) {
     return res.status(400).json({ message: "Please fill in all fields" });
   }
@@ -70,10 +72,13 @@ exports.uploadProfilePic = async (req, res) => {
   try {
     const { profilePic } = req.body;
     const userId = req.user._id;
+
     if (!profilePic) {
       return res.status(400).json({ message: "Profile picture is required" });
     }
+
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadResponse.secure_url },
@@ -89,6 +94,17 @@ exports.uploadProfilePic = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error while uploading profile picture",
+    });
+  }
+};
+
+exports.checkAuth = async (req, res) => {
+  //เพิ่มฟังก์ชันตรวจสอบการตรวจสอบ
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error while checking authentication",
     });
   }
 };
