@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const { connectDB } = require("./lib/db");
 const authRouter = require("./routes/auth.router");
 const messageRouter = require("./routes/message.router");
+const friendRouter = require("./routes/friend.router");
 const { app, server } = require("./lib/socket"); // Import app and server from socket.js
 
 const BASE_URL = process.env.BASE_URL;
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/message", messageRouter);
+app.use("/api/v1/friend", friendRouter);
 
 // Start the server using the imported server object
 server.listen(PORT, () => {

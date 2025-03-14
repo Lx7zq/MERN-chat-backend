@@ -65,7 +65,7 @@ exports.signin = async (req, res) => {
   }
 };
 exports.signout = async (req, res) => {
-  res.clearCookie("token");
+  res.cookie("jwt", "", { maxAge: 0 });
   res.json({ message: "Signout success" });
 };
 exports.uploadProfilePic = async (req, res) => {

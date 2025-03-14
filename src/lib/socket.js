@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const http = require("http");
 const express = require("express");
+const { log } = require("console");
 
 const app = express();
 const server = http.createServer(app);
@@ -10,6 +11,7 @@ const io = new Server(server, {
     origin: [process.env.BASE_URL],
   },
 });
+console.log(process.env.BASE_URL);
 
 const userSocketMap = {}; //{userId:socketId}
 
@@ -23,9 +25,16 @@ io.on("connection", (socket) => {
   if (userId) {
     userSocketMap[userId] = socket.id;
   }
-  io.emit("genOnlineUsers", Object.keys(userSocketMap));
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  socket.on("disconnect", () => {
+  socket.on("friendRequestSent", (friendId) => {
+    const receiverSocketId = getReceiverSocketId(friendId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequestReceived", userId);
+    }
+  });
+
+  socket.on("disconnects", () => {
     console.log("A User disconnected", socket.id);
     delete userSocketMap[userId];
   });
